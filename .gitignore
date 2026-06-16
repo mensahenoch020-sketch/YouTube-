@@ -5,11 +5,16 @@ credentials.json
 # Node
 node_modules/
 
+# Python
+__pycache__/
+*.pyc
+
 # Generated media (keep the folder, ignore large outputs)
 output/*
 !output/.gitkeep
 *.mp4
 *.mov
+*.srt
 *.png
 *.jpg
 *.jpeg

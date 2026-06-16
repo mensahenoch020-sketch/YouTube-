@@ -49,14 +49,26 @@ if [ -n "${HIGGSFIELD_CREDENTIALS_JSON:-}" ]; then
   log "Restored saved credentials -> $CRED_FILE"
 fi
 
-# 4. Report auth status so the agent/user knows whether a login is needed.
+# 4. Report Higgsfield auth status (optional premium path).
 if command -v higgsfield >/dev/null 2>&1; then
   if higgsfield auth token >/dev/null 2>&1; then
-    log "Authenticated and ready. Try: scripts/generate-video.sh \"your prompt\""
+    log "Higgsfield authenticated (optional premium AI clips)."
   else
-    log "NOT authenticated. Run 'higgsfield auth login' and open the printed URL"
-    log "on your phone, then run scripts/save-auth.sh to persist it for next time."
+    log "Higgsfield not authenticated. To use it: 'higgsfield auth login' (optional)."
   fi
+fi
+
+# 5. FREE faceless-video maker dependencies (no GPU, no credits).
+#    Installs the Python TTS + a static ffmpeg so scripts/make_video.py works
+#    every session. Best-effort; never blocks startup.
+log "Installing free video-maker deps (edge-tts, ffmpeg) ..."
+pip3 install --quiet --disable-pip-version-check \
+  edge-tts requests Pillow imageio-ffmpeg >/dev/null 2>&1 \
+  || log "Note: pip deps install had issues this session (continuing)."
+if python3 -c "import edge_tts, imageio_ffmpeg" >/dev/null 2>&1; then
+  log "Free video maker ready. Try: python3 scripts/make_video.py --script stories/sample.txt"
+else
+  log "Note: free video-maker deps not fully available this session."
 fi
 
 exit 0

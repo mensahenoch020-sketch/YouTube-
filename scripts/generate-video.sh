@@ -3,7 +3,7 @@
 #
 # Usage:
 #   scripts/generate-video.sh "a slow push through a neon city at night"
-#   scripts/generate-video.sh "..." --model kling3_0 --aspect-ratio 16:9
+#   scripts/generate-video.sh "..." --model kling3_0 --duration 8 --mode pro
 #   scripts/generate-video.sh "..." --duration 5 --mode pro --sound off
 #
 # Defaults are tuned for YouTube Shorts (vertical 9:16). Any extra flags after
@@ -53,6 +53,6 @@ echo
 # --wait blocks until the job finishes and prints the result URL(s).
 higgsfield generate create "$MODEL" \
   --prompt "$PROMPT" \
-  --aspect-ratio "$ASPECT" \
+  --aspect_ratio "$ASPECT" \
   --wait \
   "${PASSTHROUGH[@]}"

@@ -1,117 +1,99 @@
 # YouTube-
 
-Make YouTube videos with **Higgsfield** AI — entirely from your phone, using
+Make **faceless YouTube videos** (story/narration) entirely from your phone, using
 [Claude Code on the web](https://code.claude.com/docs/en/claude-code-on-the-web).
-No computer needed. This repo sets itself up automatically every session.
+No computer, no GPU, and — for the free maker — **no API keys and no credits**.
+
+There are two ways to make videos here:
+
+| | **Free maker** (recommended) | **Higgsfield** (optional, premium) |
+|---|---|---|
+| Cost | **$0**, unlimited | Paid credits |
+| API key | **None** | None (web login) |
+| Best for | Narration/story Shorts & long-form | Short AI-generated cinematic clips |
+| How | voiceover + real images + captions | true AI text-to-video |
 
 ---
 
-## ✅ What you need / 🚫 What you DON'T
+# 🆓 Free faceless-video maker (no credits, no keys)
 
-**You DON'T need:**
-- ❌ An **API key** — Higgsfield doesn't use one. You just log in.
-- ❌ To **install anything on your phone** — your phone is only the screen. The
-  software runs in the cloud session.
-- ❌ To **share your Higgsfield password** with Claude. Never type it in the chat
-  or any file. Claude will never ask for it.
+It turns a written story into a finished video with:
+- **AI voiceover** — free neural voice (edge-tts), no key.
+- **Real visuals** — freely-licensed images (Openverse/Wikimedia, **no key**), animated
+  with a slow pan/zoom (Ken Burns) so it feels like video.
+- **Captions locked to the voice** — the voiceover is transcribed on-device (Whisper)
+  so words appear exactly when spoken.
+- Everything stitched with ffmpeg. Output is ready to upload.
 
-**You DO need:**
-- ✅ A **Higgsfield account** with some **credits** (video generation uses credits).
-- ✅ To tap a **login link once** on your phone.
-
----
-
-## 📱 Step-by-step (all on your phone)
-
-### Step 1 — Start a session
-Open this repo in Claude Code on the web and start a session. Wait a moment —
-the setup runs automatically and installs the Higgsfield tool for you.
-
-### Step 2 — Log in (one time)
-Tell Claude:
-
-> Run `higgsfield auth login`
-
-It prints a **link** (and maybe a short code). **Open that link in your phone's
-browser**, sign in to your Higgsfield account, and approve. The session then
-shows you're logged in. *(This is you logging in on Higgsfield's own website —
-Claude never sees your password.)*
-
-### Step 3 — Stay logged in (so you don't repeat Step 2 every time)
-Tell Claude:
-
-> Run `scripts/save-auth.sh`
-
-It prints **one line** (a temporary access **token** — not your password). Copy it.
-Then in your Claude Code **environment settings**, add a secret named:
-
-```
-HIGGSFIELD_CREDENTIALS_JSON
-```
-
-and paste that line as the value. Done — future sessions log you in automatically.
-*(Never commit this value to the repo.)*
-
-### Step 4 — Make a video 🎬
-Just ask Claude in plain English. Examples:
-
-> Make a vertical 9:16 video of a slow camera push through a neon Tokyo alley at
-> night, cinematic, using Higgsfield.
-
-> Animate this photo into a 5-second clip using Higgsfield. *(attach/point to an image)*
-
-Claude uses the built-in `/higgsfield:generate` skill. Generation takes a few
-minutes; when it's done you get a **link to your video** — tap to watch or
-download on your phone.
-
-Prefer a command? You can also run:
+### Make a video
+1. Put your story in a text file under `stories/` (or just tell Claude the story).
+2. Ask Claude, or run:
 
 ```bash
-scripts/generate-video.sh "slow push through a neon Tokyo alley at night, cinematic"
+# Vertical 9:16 Short (default)
+scripts/make-short.sh stories/sample.txt
+
+# Long-form 16:9
+python3 scripts/make_video.py --script stories/sample.txt --format long
+
+# Pick the image theme + a different voice
+python3 scripts/make_video.py --script stories/sample.txt \
+    --keywords "lighthouse,storm,ocean" --voice en-US-AriaNeural
 ```
 
-### Step 5 — Handy extras
-```bash
-higgsfield account              # check your remaining credits
-higgsfield model list --video   # see available video models
-```
-Default output is **vertical 9:16** (YouTube Shorts). For widescreen add
-`--aspect-ratio 16:9` to the script, or just ask Claude for "16:9".
+The finished `.mp4` lands in `output/` (plus an `.srt` caption file you can upload to
+YouTube). On a phone, just say *"make a short from stories/sample.txt"* and Claude runs it
+and sends you the video.
+
+### Options
+- `--format shorts|long` — 9:16 (default) or 16:9.
+- `--keywords "a,b,c"` — what the background images show. If omitted, they're picked from
+  your story automatically.
+- `--voice` — any [edge-tts voice](https://github.com/rany2/edge-tts) (e.g.
+  `en-US-GuyNeural`, `en-US-AriaNeural`, `en-GB-RyanNeural`).
+- `--music path.mp3` — optional background music (drop files in `assets/music/`), auto-ducked
+  under the voice.
+
+### Want real stock *video* clips? (still free, optional)
+The maker uses keyless images by default. If you want moving stock footage, get a **free**
+[Pexels API key](https://www.pexels.com/api/) (free signup, no card) and add it as an
+environment secret named `PEXELS_API_KEY`. The maker will then prefer Pexels video clips.
 
 ---
 
-## 🔒 Security note
-Claude **never needs and will never ask for your Higgsfield password**. You log in
-yourself via the link in Step 2. The only thing stored is a temporary access token
-(Step 3), which you save as a secret — never share your password with anyone.
+# 🎬 Higgsfield (optional premium path)
+
+For true AI-generated cinematic clips. Uses **no API key** (web login) but **costs credits**.
+
+1. **Log in once:** ask Claude to run `higgsfield auth login`, open the printed link on your
+   phone, sign in, approve. *(Claude never sees your password.)*
+2. **Stay logged in:** run `scripts/save-auth.sh`, copy the line, and add it as an environment
+   secret named `HIGGSFIELD_CREDENTIALS_JSON`. (It's a token, **not** your password — never
+   commit it.)
+3. **Generate:** *"Make a vertical 9:16 video of … using Higgsfield"*, or
+   `scripts/generate-video.sh "your prompt"`. Check credits with `higgsfield account status`.
+
+🔒 Claude will **never** ask for your Higgsfield password — you log in yourself via the link.
 
 ---
 
-## What's in this repo (for reference)
+## What's in this repo
 
 | Path | Purpose |
 | --- | --- |
-| `.claude/hooks/session-start.sh` | Runs each session: installs the Higgsfield CLI + restores your login. |
-| `.claude/settings.json` | Registers the SessionStart hook. |
-| `.claude/skills/`, `.agents/skills/` | The official Higgsfield skills (`/higgsfield:generate`, etc.). |
-| `scripts/generate-video.sh` | One-command video generation (defaults to vertical 9:16). |
-| `scripts/save-auth.sh` | Prints your login token to save as a secret (Step 3). |
-| `output/` | A place to keep notes/links to generated results. |
+| `scripts/make_video.py` | The free maker: voiceover + images + captions → mp4. |
+| `scripts/make-short.sh` | One-command vertical Short. |
+| `stories/` | Put your narration scripts here (`stories/sample.txt` included). |
+| `assets/music/` | Optional background music. |
+| `output/` | Finished videos + caption files. |
+| `.claude/hooks/session-start.sh` | Installs all deps every session (ephemeral container). |
+| `scripts/generate-video.sh`, `scripts/save-auth.sh` | Higgsfield helpers (optional). |
 
 ## Troubleshooting
-- **"Not authenticated"** — redo Step 2 (`higgsfield auth login`). If it keeps
-  asking every session, make sure the `HIGGSFIELD_CREDENTIALS_JSON` secret from
-  Step 3 is set.
-- **Install/network errors** — the environment's
-  [network policy](https://code.claude.com/docs/en/claude-code-on-the-web) must
-  allow the npm registry and `higgsfield.ai`. Adjust it in environment settings.
-- **No video / out of credits** — check `higgsfield account` and top up credits
-  in your Higgsfield account.
-
-### Discovering models and parameters
-```bash
-higgsfield model list --video                     # available video models
-higgsfield model get <model>                      # accepted params for a model
-higgsfield generate cost <model> --prompt "..."   # estimate credits first
-```
-Defaults can be changed with env vars: `HIGGSFIELD_VIDEO_MODEL`, `HIGGSFIELD_ASPECT`.
+- **Setup/network errors** — the environment's
+  [network policy](https://code.claude.com/docs/en/claude-code-on-the-web) must allow the npm
+  + PyPI registries and the media sites; adjust it in environment settings.
+- **Captions slightly off** — they're aligned with Whisper; set a bigger model with
+  `WHISPER_MODEL=small` for more accuracy (slower).
+- **Higgsfield "not authenticated" / out of credits** — re-run `higgsfield auth login`; check
+  `higgsfield account status`.
