@@ -1,0 +1,17 @@
+# Never commit Higgsfield credentials
+credentials.json
+.config/
+
+# Node
+node_modules/
+
+# Generated media (keep the folder, ignore large outputs)
+output/*
+!output/.gitkeep
+*.mp4
+*.mov
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
